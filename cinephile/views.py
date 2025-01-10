@@ -258,12 +258,12 @@ def aspirant_posts(request):
 def post_details(request, post_id):
     # Fetch the post and reactions
     post = get_object_or_404(AspirantPosts, id=post_id)
-    reactions = Reactions.objects.filter(post=post)
-    likes = reactions.filter(like=True).count()
-    comments = reactions.exclude(comment__isnull=True).exclude(comment__exact="").count()
+    reactions = Reactions.objects.filter(post=post, is_commented=True)
+    likes = Reactions.objects.filter(like=True, post=post).count()
+    comments = Reactions.objects.filter(is_commented=True, post=post).count()
 
     # Get the user's reaction if it exists
-    self_reaction = reactions.filter(user=request.user).first()
+    self_reaction = Reactions.objects.filter(user=request.user, post=post).first()
 
     if request.method == 'POST':
         # Handle form submission
@@ -314,9 +314,9 @@ def post_approval(request):
     return render(request, 'post_approval.html', {'posts': posts, 'approved_posts': approved_posts})
 
 def all_posts(request):
-    posts = AspirantPosts.objects.annotate(
+    posts = AspirantPosts.objects.filter(verification=True).annotate(
         like_count=Count('reactions', filter=Q(reactions__like=True)),
-        comment_count=Count('reactions', filter=Q(reactions__comment__isnull=False))
+        comment_count=Count('reactions', filter=Q(reactions__is_commented=True))
     ).order_by('-uploaded_at')
 
     if request.method == 'POST':
@@ -332,13 +332,11 @@ def agency_react(request, post_id):
     likes = Reactions.objects.filter(post=post, like=True).count()
     comments = Reactions.objects.filter(is_commented=True, post=post).count()
 
-    self_reaction = reactions.filter(user=request.user).first()
-
+    self_reaction = Reactions.objects.filter(post=post, user=request.user).first()
     if request.method == 'POST':
         # Handle form submission
         like = request.POST.get('like') == 'true'  # Convert to boolean
         comment = request.POST.get('comment', '').strip()
-        print(comment)
 
         if self_reaction:
             # Update the existing reaction

@@ -200,6 +200,7 @@ like-button {
                 <div class="d-flex">
                   <div class="comment-img"><img src="{{ reaction.user.image.url }}" alt=""></div>
                   <div>
+                    <span>{{ reaction.user.username }}</span>
                     <time datetime="2020-01-01">{{ reaction.uploaded_at }}</time>
                     <p>
                      {{reaction.comment}}
