@@ -1,0 +1,340 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>CINEPHILE</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+  <style>
+    .post-img {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.file-thumbnail {
+  max-width: 200px; /* Restricts the maximum width */
+  max-height: 150px; /* Restricts the maximum height */
+  object-fit: cover; /* Ensures proper scaling for images and videos */
+  border: 1px solid #ddd; /* Optional border for uniformity */
+  border-radius: 5px; /* Optional rounded corners */
+  overflow: hidden;
+}
+
+.img-fluid {
+  width: 100%; /* Responsive image scaling */
+  height: auto;
+}
+
+.video-thumbnail {
+  display: block; /* Ensures proper video display */
+  width: 100%; /* Ensures videos scale responsively */
+}
+like-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+}
+
+.like-checkbox {
+    display: none; /* Hide the default checkbox */
+}
+
+.like-label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: bold;
+    color: #000000;
+    transition: color 0.3s, transform 0.2s;
+}
+
+/* Change color and scale on hover */
+.like-label:hover {
+    color: #111111;
+    transform: scale(1.1);
+    font-size: 25px;
+}
+
+/* Styling the heart icon */
+.like-label .bi-heart {
+    font-size: 1.5rem;
+    transition: color 0.3s;
+}
+
+/* Highlight the heart when checkbox is checked */
+.like-checkbox:checked + .like-label .bi-heart {
+    color: #007bff;
+    font-size: 20px;
+}
+
+.like-checkbox:checked + .like-label {
+    color: #007bff;
+    font-weight: bold;
+    font-size: 20px;
+}
+  </style>
+</head>
+
+<body class="blog-details-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+
+      <a href="" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <h1 class="sitename">Cinephile</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'aspirant_index' %}">Home</a></li>
+          <li><a href="{% url 'aspirant_posts' %}">Post</a></li>
+          
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="cta-btn" href="{% url 'logout' %}">Logout</a>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" data-aos="fade" style="background-image: url(../static/assets/img/batman_fanart-wallpaper-2560x1080.jpg);">
+      <div class="container position-relative">
+        <h1>Post Details</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'aspirant_index' %}">Home</a></li>
+            <li class="current">Post Details</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <div class="container">
+      <div class="row">
+
+        <div class="col-lg-8">
+
+          <!-- Blog Details Section -->
+          <section id="blog-details" class="blog-details section" data-aos="fade-up">
+            <div class="container">
+
+              <article class="article">
+
+                <div class="post-img">
+                    {% if post.file %}
+                      {% if post.get_file_type == 'image' %}
+                        <img src="{{ post.file.url }}" alt="Uploaded Image" class="img-fluid file-thumbnail">
+                      {% elif post.get_file_type == 'video' %}
+                        <video controls class="video-thumbnail file-thumbnail">
+                          <source src="{{ post.file.url }}" type="video/mp4">
+                          Your browser does not support the video tag.
+                        </video>
+                      {% elif post.get_file_type == 'document' %}
+                        <a href="{{ post.file.url }}" target="_blank" class="btn btn-primary file-thumbnail">Download Document</a>
+                      {% else %}
+                        <a href="{{ post.file.url }}" target="_blank" class="file-thumbnail">View File</a>
+                      {% endif %}
+                    {% else %}
+                      <p>No file uploaded.</p>
+                    {% endif %}
+                  </div>
+
+                <h2 class="title">{{ post.description }}</h2>
+
+                <div class="meta-top">
+                  <ul>
+                    <li class="d-flex align-items-center"><i class="bi bi-person"></i> <a href="">{{ post.user.username }}</a></li>
+                    <li class="d-flex align-items-center"><i class="bi bi-heart"></i> <a href="">{{ likes }}</a></li>
+                    <li class="d-flex align-items-center"><i class="bi bi-chat-dots"></i> <a href="">{{comments}} Comments</a></li>
+                    <li class="d-flex align-items-center"><i class="bi bi-calendar-event"></i> <a href="">{{ post.uploaded_at }}</a></li>
+                  </ul>
+                </div><!-- End meta top -->
+
+              </article>
+
+            </div>
+          </section><!-- /Blog Details Section -->
+
+          <!-- Blog Comments Section -->
+          <section id="blog-comments" class="blog-comments section" data-aos="fade-up">
+
+            <div class="container">
+
+              <h4 class="comments-count">{{ comments }} Reviews</h4>
+
+              {% for reaction in reactions %}
+
+
+              <div id="comment-1" class="comment">
+                <div class="d-flex">
+                  <div class="comment-img"><img src="{{ reaction.user.image.url }}" alt=""></div>
+                  <div>
+                    <time datetime="2020-01-01">{{ reaction.uploaded_at }}</time>
+                    <p>
+                     {{reaction.comment}}
+                    </p>
+                  </div>
+                </div>
+              </div><!-- End comment #1 -->
+
+              {% endfor %}
+
+
+            </div>
+
+          </section><!-- /Blog Comments Section -->
+        </div>
+
+        <div class="col-lg-4 sidebar">
+
+          <div class="widgets-container">
+
+            <!-- Blog Author Widget -->
+            <div class="blog-author-widget widget-item" data-aos="fade-up">
+
+              <div class="d-flex flex-column align-items-center">
+                <div class="d-flex align-items-center w-100">
+                  <img src="{{ request.user.image.url }}" class="rounded-circle flex-shrink-0" alt="">
+                  <div>
+                    <h4>{{ request.user.username }}</h4>
+                    <div class="social-links">
+                      <a href=""><i class="bi bi-twitter-x"></i></a>
+                      <a href=""><i class="bi bi-facebook"></i></a>
+                      <a href=""><i class="biu bi-instagram"></i></a>
+                      <a href=""><i class="biu bi-linkedin"></i></a>
+                    </div>
+                  </div>
+                </div>
+
+                <p>
+                  Role: {{ request.user.role }}
+                </p>
+
+                <!-- Comment Form Section -->
+                <section id="comment-form" class="comment-form section">
+                    <div class="container">
+                        <form action="{% url 'post_details' post.id %}" method="post">
+                            {% csrf_token %}
+                            
+                            <div class="row">
+                                <div class="col form-group">
+                                    <div class="like-button">
+                                        <!-- Custom Like Button -->
+                                        <input type="checkbox" name="like" id="like" value="true" class="like-checkbox" 
+                                            {% if self_reaction and self_reaction.like %}checked{% endif %}>
+                                        <label for="like" class="like-label">
+                                            <i class="bi {% if self_reaction and self_reaction.like %}bi-heart-fill{% else %}bi-heart{% endif %}" aria-hidden="true"></i>
+                                            {% if self_reaction and self_reaction.like %}Liked{% else %}Like{% endif %}
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                
+                            <!-- Comment Section -->
+                            <div class="row">
+                                <div class="col form-group">
+                                    <label for="comment">Your Comment:</label>
+                                    <textarea id="comment" rows="4" class="form-control" placeholder="Write your comment here..." name="comment">{{ self_reaction.comment }}</textarea>
+                                </div>
+                            </div>
+                
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+              </div>
+
+            </div><!--/Blog Author Widget -->
+
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+    <div class="container">
+      <h3 class="sitename">Cinephile</h3>
+      <p>a movie related platform</p>
+      <div class="social-links d-flex justify-content-center">
+        <a href=""><i class="bi bi-twitter-x"></i></a>
+        <a href=""><i class="bi bi-facebook"></i></a>
+        <a href=""><i class="bi bi-instagram"></i></a>
+        <a href=""><i class="bi bi-skype"></i></a>
+        <a href=""><i class="bi bi-linkedin"></i></a>
+      </div>
+      <div class="container">
+        <div class="copyright">
+          <span>Copyright</span> <strong class="px-1 sitename">Cinephile</strong> <span>All Rights Reserved</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+  <script>
+    const ratingInput = document.getElementById('rating');
+    const ratingValue = document.getElementById('ratingValue');
+
+    ratingInput.addEventListener('input', () => {
+        ratingValue.textContent = ratingInput.value;
+    });
+</script>
+
+</body>
+
+</html>

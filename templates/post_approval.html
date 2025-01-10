@@ -1,0 +1,266 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>CINEPHILE</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+    <style>
+  table {
+    table-layout: fixed;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    text-align: center;
+    vertical-align: middle;
+    overflow: hidden;
+    word-wrap: break-word;
+    padding: 10px;
+}
+
+.table-image {
+    height: 100px;
+    width: 100px;
+    object-fit: cover;
+    display: block;
+    margin: auto;
+    border-radius: 5px;
+}
+</style>
+  
+</head>
+
+<body class="blog-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+
+      <a href="#" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <h1 class="sitename">Cinephile</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'admin_index' %}">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="{% url 'user_approval' %}">Users</a></li>
+          <li><a href="{% url 'add_movie' %}">Movies</a></li>
+          <li><a href="{% url 'post_approval' %}" class="active">Post</a></li>
+          
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="cta-btn" href="{% url 'logout' %}">Logout</a>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" data-aos="fade" style="background-image: url(../static/assets/img/batman_fanart-wallpaper-2560x1080.jpg);">
+      <div class="container position-relative">
+        <h1>Users</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'admin_index' %}">Home</a></li>
+            <li class="current">Blog</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <!-- Hero Section -->
+    <section id="blog-posts" class="blog-posts section">
+
+      <div class="container">
+            <h2>Posts for Approval</h2><br>
+                <table class="table table-bordered table-hover" data-aos="fade-up" data-aos-delay="100">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>File</th>
+                      <th>Description</th>
+                      <th>Username</th>
+                      <th>Mobile</th>
+                      <th>Uploaded At</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for post in posts %}
+                    <tr>
+                        <td>
+                            {% if post.file %}
+                                {% if post.get_file_type == 'image' %}
+                                    <!-- Display image -->
+                                    <img src="{{ post.file.url }}" alt="Uploaded Image" class="table-image">
+                                {% elif post.get_file_type == 'video' %}
+                                    <!-- Display video thumbnail or player -->
+                                    <video controls class="table-image">
+                                        <source src="{{ post.file.url }}" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                {% elif post.get_file_type == 'document' %}
+                                    <!-- Provide a link to download/view document -->
+                                    <a href="{{ post.file.url }}" target="_blank" class="btn btn-primary">View Document</a>
+                                {% else %}
+                                    <!-- Fallback for other file types -->
+                                    <a href="{{ post.file.url }}" target="_blank">Download File</a>
+                                {% endif %}
+                            {% else %}
+                                <!-- No file uploaded -->
+                                <p>No file available</p>
+                            {% endif %}
+                        </td>
+                    <td>{{ post.description }}</td>
+                    <td> {{ post.user.username }} </td>
+                        <td> {{ post.user.mobile }} </td>
+                        <td> {{ post.uploaded_at }} </td>
+                        <td>
+                        <form action="/post_approval/" method="POST" data-aos="fade-up" data-aos-delay="200">
+                            {% csrf_token %}
+                            <input type="hidden" value="{{post.id}}" id="post_id" name="post_id">
+                            <button name="action" value="approve" type="submit" class="btn btn-success">Approve</button>
+                            <button name="action" value="delete" type="submit" class="btn btn-warning" onclick="return remove()">Reject</button>
+                        </form>
+                        </td>
+                    </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table><br>
+
+                <h2>Approved Posts</h2><br>
+                <table class="table table-bordered table-hover" data-aos="fade-up" data-aos-delay="100">
+                    <thead class="table-dark">
+                      <tr>
+                        <th>File</th>
+                        <th>Description</th>
+                        <th>Username</th>
+                        <th>Mobile</th>
+                        <th>Uploaded At</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {% for post in approved_posts %}
+                      <tr>
+                          <td>
+                              {% if post.file %}
+                                  {% if post.get_file_type == 'image' %}
+                                      <!-- Display image -->
+                                      <img src="{{ post.file.url }}" alt="Uploaded Image" class="table-image">
+                                  {% elif post.get_file_type == 'video' %}
+                                      <!-- Display video thumbnail or player -->
+                                      <video controls class="table-image">
+                                          <source src="{{ post.file.url }}" type="video/mp4">
+                                          Your browser does not support the video tag.
+                                      </video>
+                                  {% elif post.get_file_type == 'document' %}
+                                      <!-- Provide a link to download/view document -->
+                                      <a href="{{ post.file.url }}" target="_blank" class="btn btn-primary">View Document</a>
+                                  {% else %}
+                                      <!-- Fallback for other file types -->
+                                      <a href="{{ post.file.url }}" target="_blank">Download File</a>
+                                  {% endif %}
+                              {% else %}
+                                  <!-- No file uploaded -->
+                                  <p>No file available</p>
+                              {% endif %}
+                          </td>
+                      <td>{{ post.description }}</td>
+                      <td> {{ post.user.username }} </td>
+                          <td> {{ post.user.mobile }} </td>
+                          <td> {{ post.uploaded_at }} </td>
+                          <td>
+                          <form action="/post_approval/" method="POST" data-aos="fade-up" data-aos-delay="200">
+                              {% csrf_token %}
+                              <input type="hidden" value="{{post.id}}" id="post_id" name="post_id">
+                              <button name="action" value="remove" type="submit" class="btn btn-danger" onclick="return remove()">Remove</button></td>
+                          </form>
+                        </td>
+                      </tr>
+                      {% endfor %}
+                    </tbody>
+                  </table><br>
+          </div>
+
+    </section><!-- /Hero Section -->
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+    <div class="container">
+      <h3 class="sitename">Cinephile</h3>
+      <p>a movie related platform</p>
+      <div class="social-links d-flex justify-content-center">
+        <a href=""><i class="bi bi-twitter-x"></i></a>
+        <a href=""><i class="bi bi-facebook"></i></a>
+        <a href=""><i class="bi bi-instagram"></i></a>
+        <a href=""><i class="bi bi-skype"></i></a>
+        <a href=""><i class="bi bi-linkedin"></i></a>
+      </div>
+      <div class="container">
+        <div class="copyright">
+          <span>Copyright</span> <strong class="px-1 sitename">Cinephile</strong> <span>All Rights Reserved</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+  <script>
+    function remove() {
+        return confirm('Are you sure you want to remove the post');
+    }
+  </script>
+
+</body>
+
+</html>
