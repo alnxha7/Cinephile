@@ -178,10 +178,14 @@ like-button {
                     <li class="d-flex align-items-center"><i class="bi bi-heart"></i> <a href="">{{ likes }}</a></li>
                     <li class="d-flex align-items-center"><i class="bi bi-chat-dots"></i> <a href="">{{comments}} Comments</a></li>
                     <li class="d-flex align-items-center"><i class="bi bi-calendar-event"></i> <a href="">{{ post.uploaded_at }}</a></li>
+                    <li class="d-flex align-items-center"><i class="bi bi-phone"></i> <a href="">{{ post.user.mobile }}</a></li>
                   </ul>
                 </div><!-- End meta top -->
-
-              </article>
+                
+            </article>
+            <a href="mailto:{{ post.user.email }}?subject=Contact via Cinephile&body=Hello,">
+                <button class="btn btn-warning" type="button">CONTACT USER</button>
+            </a>
 
             </div>
           </section><!-- /Blog Details Section -->

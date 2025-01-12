@@ -4,6 +4,9 @@ from django.contrib.auth import login, logout
 from .models import User, Movies, Review, AspirantPosts, Reactions
 from datetime import datetime
 from django.db.models import Q, Count
+from django.contrib.auth.decorators import login_required
+import requests
+from django.http import HttpResponseBadRequest
 
 def home(request):
     return render(request, 'index.html')
@@ -69,22 +72,26 @@ def login_view(request):
                 
             else:
                 print('invalid email or password')
-                return redirect('login')
+                return render(request, 'login.html', {'message': 'Invalid email or password'})
         except User.DoesNotExist:
             print('user dows not exist')
-            return redirect('home')
+            return render(request, 'login.html', {'message': 'user does not exist'})
         
     return render(request, 'login.html')
 
+@login_required
 def admin_index(request):
     return render(request, 'admin_index.html')
 
+@login_required
 def agency_index(request):
     return render(request, 'agency_index.html')
 
+@login_required
 def critics_index(request):
     return render(request, 'critics_index.html')
 
+@login_required
 def aspirant_index(request):
     return render(request, 'aspirant_index.html')
 
@@ -92,6 +99,7 @@ def logout_user(request):
     logout(request)
     return redirect('home')
 
+@login_required
 def user_approval(request):
     users = User.objects.filter(verification_status=False, is_superuser=False)
     approved_users = User.objects.filter(verification_status=True, is_superuser=False)
@@ -109,6 +117,7 @@ def user_approval(request):
         
     return render(request, 'user_approval.html', {'users': users, 'approved_users': approved_users})
 
+@login_required
 def add_movie(request):
     movies = Movies.objects.all()
     if request.method == 'POST':
@@ -134,6 +143,7 @@ def add_movie(request):
             return redirect('admin_manage_reviews', movie_id=movie_id)
     return render(request, 'add_movie.html', {'movies': movies})
 
+@login_required
 def edit_movie(request, movie_id):
     movie = Movies.objects.get(id=movie_id)
     movies = Movies.objects.all()
@@ -149,6 +159,7 @@ def edit_movie(request, movie_id):
         movie.save()
     return render(request, 'edit_movie.html', {'movie': movie, 'movies': movies})
 
+@login_required
 def critics_view_movies(request):
     movies = Movies.objects.all()
 
@@ -159,6 +170,7 @@ def critics_view_movies(request):
             return redirect('review_movie', movie_id)
     return render(request, 'critics_view_movies.html', {'movies': movies})
 
+@login_required
 def review_movie(request, movie_id):
     movie = Movies.objects.get(id=movie_id)
     movie_reviews = Review.objects.filter(movie=movie, user__role='critics')
@@ -185,18 +197,21 @@ def review_movie(request, movie_id):
 
     return render(request, 'review_movie.html', {'movie': movie, 'movie_reviews': movie_reviews, 'movie_reviews': movie_reviews, 'count': count})
 
+@login_required
 def admin_manage_reviews(request, movie_id):
     movie = Movies.objects.get(id=movie_id)
     movie_reviews = Review.objects.filter(movie=movie, user__role='critics')
     count = len(movie_reviews)
     return render(request, 'admin_manage_reviews.html', {'movie': movie, 'movie_reviews': movie_reviews, 'count': count})
 
+@login_required
 def delete_review(request, movie_review_id):
     review = Review.objects.get(id=movie_review_id)
     movie_id = review.movie.id
     review.delete()
     return redirect('admin_manage_reviews', movie_id)
 
+@login_required
 def aspirant_view_movies(request):
     movies = Movies.objects.all()
 
@@ -207,6 +222,7 @@ def aspirant_view_movies(request):
             return redirect('aspirant_review', movie_id)
     return render(request, 'aspirant_view_movies.html', {'movies': movies})
 
+@login_required
 def aspirant_review(request, movie_id):
     movie = Movies.objects.get(id=movie_id)
     movie_reviews = Review.objects.filter(movie=movie, user__role='critics')
@@ -232,6 +248,7 @@ def aspirant_review(request, movie_id):
 
     return render(request, 'aspirant_review.html', context)
 
+@login_required
 def aspirant_posts(request):
     posts = AspirantPosts.objects.filter(user=request.user)
     if request.method == 'POST':
@@ -255,6 +272,7 @@ def aspirant_posts(request):
 
     return render(request, 'aspirant_posts.html', {'posts': posts})
 
+@login_required
 def post_details(request, post_id):
     # Fetch the post and reactions
     post = get_object_or_404(AspirantPosts, id=post_id)
@@ -291,6 +309,7 @@ def post_details(request, post_id):
     }
     return render(request, 'post_details.html', context)
 
+@login_required
 def post_approval(request):
     posts = AspirantPosts.objects.filter(verification=False)
     approved_posts = AspirantPosts.objects.filter(verification=True)
@@ -313,6 +332,7 @@ def post_approval(request):
             return redirect('post_approval')
     return render(request, 'post_approval.html', {'posts': posts, 'approved_posts': approved_posts})
 
+@login_required
 def all_posts(request):
     posts = AspirantPosts.objects.filter(verification=True).annotate(
         like_count=Count('reactions', filter=Q(reactions__like=True)),
@@ -326,6 +346,7 @@ def all_posts(request):
             return redirect('agency_react', post_id)
     return render(request, 'all_posts.html', {'posts': posts})
 
+@login_required
 def agency_react(request, post_id):
     post = get_object_or_404(AspirantPosts, id=post_id)
     reactions = Reactions.objects.filter(post=post, is_commented=True)
@@ -350,3 +371,65 @@ def agency_react(request, post_id):
     
     context = {'reactions': reactions, 'post': post, 'likes': likes, 'comments': comments, 'self_reaction': self_reaction}
     return render(request, 'agency_react.html', context)
+
+@login_required
+def aspirants_all_post(request):
+    posts = AspirantPosts.objects.filter(verification=True).annotate(
+        like_count=Count('reactions', filter=Q(reactions__like=True)),
+        comment_count=Count('reactions', filter=Q(reactions__is_commented=True))
+    ).order_by('-uploaded_at')
+
+    if request.method == 'POST':
+        post_id = request.POST.get('post_id')
+        action = request.POST.get('action')
+        if action == 'react':
+            return redirect('aspirant_react', post_id)
+
+    return render(request, 'aspirants_all_post.html', {'posts': posts})
+
+@login_required
+def aspirant_react(request, post_id):
+    post = get_object_or_404(AspirantPosts, id=post_id)
+    reactions = Reactions.objects.filter(post=post, is_commented=True)
+    likes = Reactions.objects.filter(post=post, like=True).count()
+    comments = Reactions.objects.filter(is_commented=True, post=post).count()
+
+    self_reaction = Reactions.objects.filter(post=post, user=request.user).first()
+    if request.method == 'POST':
+        # Handle form submission
+        like = request.POST.get('like') == 'true'  # Convert to boolean
+        comment = request.POST.get('comment', '').strip()
+
+        if self_reaction:
+            # Update the existing reaction
+            self_reaction.like = like
+            self_reaction.comment = comment
+            self_reaction.save()
+        else:
+            # Create a new reaction
+            Reactions.objects.create(post=post, user=request.user, like=like, comment=comment)
+        return redirect('aspirant_react', post_id)
+    
+    context = {'reactions': reactions, 'post': post, 'likes': likes, 'comments': comments, 'self_reaction': self_reaction}
+    return render(request, 'aspirant_react.html', context)
+
+def movie_details(request, movie_title, movie_year=None):
+    OMDB_API_KEY = "1d371824"      
+    if not movie_title:
+        return HttpResponseBadRequest("Movie title is required.")
+    
+    # Construct URL with title and optional year
+    url = f"https://www.omdbapi.com/?t={movie_title}&y={movie_year}&apikey={OMDB_API_KEY}"
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        movie = response.json()
+
+        if movie.get('Response') == 'True':
+            return render(request, 'movie_details.html', {'movie': movie})
+        else:
+            return render(request, 'movie_details.html', {'error': movie.get('Error', 'Movie not found.')})
+    
+    except requests.RequestException as e:
+        return render(request, 'movie_details.html', {'error': f"Error fetching movie details: {e}"})

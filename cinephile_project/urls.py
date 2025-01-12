@@ -48,6 +48,10 @@ urlpatterns = [
     path('post_approval/', views.post_approval, name='post_approval'),
     path('all_posts/', views.all_posts, name='all_posts'),
     path('agency_react/<int:post_id>', views.agency_react, name='agency_react'),
+
+    path('aspirants_all_post/', views.aspirants_all_post, name='aspirants_all_post'),
+    path('aspirant_react/<int:post_id>', views.aspirant_react, name='aspirant_react'),
+    path('movie_details/<str:movie_title>/<int:movie_year>/', views.movie_details, name='movie_details'),
 ]
 
 if settings.DEBUG:

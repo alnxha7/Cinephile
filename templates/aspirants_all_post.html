@@ -1,0 +1,251 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>CINEPHILE</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="{% static 'assets/img/favicon.png' %}" rel="icon">
+  <link href="{% static 'assets/img/apple-touch-icon.png' %}" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="{% static 'assets/vendor/bootstrap/css/bootstrap.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/bootstrap-icons/bootstrap-icons.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/aos/aos.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/glightbox/css/glightbox.min.css' %}" rel="stylesheet">
+  <link href="{% static 'assets/vendor/swiper/swiper-bundle.min.css' %}" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+  <style>
+    .reel-item {
+  display: flex;
+  flex-direction: row; /* Change to row to align children horizontally */
+  align-items: center; /* Align items vertically in the center */
+  justify-content: space-between; /* Add space between file and details */
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  padding: 10px;
+  gap: 20px; /* Space between file and details */
+  height: 80vh;
+}
+
+.reel-media {
+  max-width: 60%; /* Adjust the size of the media */
+  max-height: 100%;
+  object-fit: cover;
+  flex-shrink: 0; /* Prevent media from shrinking */
+}
+
+.reel-details {
+  text-align: left;
+  padding: 10px;
+}
+
+.reel-details img {
+  height: 100px;
+  width: 100px;
+  object-fit: cover;
+  border-radius: 50%; /* Ensure circular profile picture */
+}
+
+.reel-details .ms-3 {
+  margin-left: 15px; /* Add spacing between profile picture and username/details */
+}
+
+.reel-details h3, .reel-details h5 {
+  margin: 0;
+}
+
+.reel-details .d-flex.align-items-center i {
+  font-size: 18px;
+  color: #555;
+}
+
+.reel-details .d-flex.align-items-center i + span {
+  margin-left: 5px; /* Add space between icon and text */
+}
+  </style>
+</head>
+
+<body class="index-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="container position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.png" alt=""> -->
+        <h1 class="sitename">Cinephile</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="{% url 'aspirant_index' %}">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#contact">Contact</a></li>
+          <li><a href="{% url 'aspirant_view_movies' %}">Movies</a></li>
+          <li><a href="{% url 'aspirant_posts' %}">My Posts</a></li>
+          <li><a href="{% url 'aspirants_all_post' %}"  class="active">All Posts</a></li>
+          
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="cta-btn" href="{% url 'logout' %}">Logout</a>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title dark-background" data-aos="fade" style="background-image: url(../static/assets/img/batman_fanart-wallpaper-2560x1080.jpg);">
+      <div class="container position-relative">
+        <h1>See What`s going on...!!!</h1>
+        <nav class="breadcrumbs">
+          <ol>
+            <li><a href="{% url 'aspirant_index' %}">Home</a></li>
+            <li class="current">Posts</li>
+          </ol>
+        </nav>
+      </div>
+    </div><!-- End Page Title -->
+
+    <section id="reels-section" class="reels-section" data-aos="fade-up">
+        <div class="container">
+          <div class="reel-container">
+            <!-- Loop through the movies/posts -->
+            {% for post in posts %}
+            <div class="reel-item">
+              {% if post.get_file_type == 'image' %}
+              <!-- Display Image -->
+              <img src="{{ post.file.url }}" alt="Image" class="reel-media">
+              {% elif post.get_file_type == 'video' %}
+              <!-- Display Video -->
+              <video controls autoplay muted loop class="reel-media">
+                <source src="{{ post.file.url }}" type="video/mp4">
+                Your browser does not support the video tag.
+              </video>
+              {% elif post.get_file_type == 'document' %}
+              <!-- Display Document -->
+              <div class="reel-document">
+                <a href="{{ post.file.url }}" target="_blank" class="btn btn-primary">
+                  <i class="bi bi-file-earmark-text"></i> View Document
+                </a>
+              </div>
+              {% else %}
+              <!-- Unsupported File Type -->
+              <div class="reel-unsupported">
+                <p>Unsupported file type</p>
+                <a href="{{ post.file.url }}" target="_blank" class="btn btn-warning">
+                  <i class="bi bi-download"></i> Download File
+                </a>
+              </div>
+              {% endif %}
+      
+              <!-- Additional Post Details -->
+              <div class="reel-details">
+                <div class="d-flex align-items-center">
+                  <!-- Profile Picture -->
+                  <img src="{{ post.user.image.url }}" style="height: 100px; width: 100px;" class="rounded-circle flex-shrink-0" alt="">
+              
+                  <!-- Username and Post Details -->
+                  <div class="ms-3"> <!-- Add margin to create spacing -->
+                    <h3>{{ post.user.username }}</h3><br>
+                    <h5>{{ post.description }}</h5>
+                    <div class="d-flex align-items-center">
+                      <i class="bi bi-heart me-2"></i> {{ post.like_count }} 
+                      <i class="bi bi-chat-dots ms-4 me-2"></i> {{ post.comment_count }}
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <form action="{% url 'aspirants_all_post' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="post_id" id="post_id" value="{{ post.id }}">
+              <button class="btn btn-info" name="action" value="react">React</button>
+            </form>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+  </main>
+
+  <footer id="footer" class="footer dark-background">
+    <div class="container">
+      <h3 class="sitename">Cinephile</h3>
+      <p>a movie related platform</p>
+      <div class="social-links d-flex justify-content-center">
+        <a href=""><i class="bi bi-twitter-x"></i></a>
+        <a href=""><i class="bi bi-facebook"></i></a>
+        <a href=""><i class="bi bi-instagram"></i></a>
+        <a href=""><i class="bi bi-skype"></i></a>
+        <a href=""><i class="bi bi-linkedin"></i></a>
+      </div>
+      <div class="container">
+        <div class="copyright">
+          <span>Copyright</span> <strong class="px-1 sitename">Cinephile</strong> <span>All Rights Reserved</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="{% static 'assets/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/php-email-form/validate.js' %}"></script>
+  <script src="{% static 'assets/vendor/aos/aos.js' %}"></script>
+  <script src="{% static 'assets/vendor/glightbox/js/glightbox.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/purecounter/purecounter_vanilla.js' %}"></script>
+  <script src="{% static 'assets/vendor/imagesloaded/imagesloaded.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/isotope-layout/isotope.pkgd.min.js' %}"></script>
+  <script src="{% static 'assets/vendor/swiper/swiper-bundle.min.js' %}"></script>
+
+  <!-- Main JS File -->
+  <script src="{% static 'assets/js/main.js' %}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+  const videos = document.querySelectorAll("video");
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      const video = entry.target;
+      if (entry.isIntersecting) {
+        // Pause other videos
+        videos.forEach((v) => {
+          if (v !== video) v.pause();
+        });
+        video.play();
+      } else {
+        video.pause();
+      }
+    });
+  }, { threshold: 0.9 }); // Adjust threshold for better focus
+
+  videos.forEach((video) => observer.observe(video));
+});
+  </script>
+
+</body>
+
+</html>

@@ -27,19 +27,6 @@
 
   <!-- Main CSS File -->
   <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
-  <style>
-    .error {
-        color: #fff;
-        background-color: #e74c3c;
-        padding: 10px;
-        border-radius: 5px;
-        margin-top: 10px;
-        text-align: center;
-        opacity: 1;
-        font-size: 10px;
-        transition: opacity 0.5s ease-out;
-    }
-  </style>
 </head>
 
 <body class="index-page">
@@ -92,7 +79,7 @@
             <button type="submit" class="btn btn-primary">Login</button>
         </form>
         {% if message %}
-            <p class="error">{{ message }}</p>
+            <p class="error-message" style="color: red;">{{ message }}</p>
         {% endif %}
       
       </div>
