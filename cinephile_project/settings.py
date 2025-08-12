@@ -134,5 +134,5 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ['cinephile-5pvd.onrender.com', '127.0.0.1', 'localhost']
+# ALLOWED_HOSTS = ['cinephile-5pvd.onrender.com', '127.0.0.1', 'localhost']
 
